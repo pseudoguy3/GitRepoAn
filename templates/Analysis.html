@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Repository Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Repository Analysis</h1>
+        {% if repo_url %}
+            <p><strong>Repository URL:</strong> <a href="{{ repo_url }}" target="_blank">{{ repo_url }}</a></p>
+        {% endif %}
+        {% if owner %}
+            <h2>Owner</h2>
+            <p>{{ owner }}</p>
+        {% endif %}
+        {% if contributors %}
+            <h2>Contributors</h2>
+            <div class="content-layout">
+                <div class="contributors-grid">
+                    {% for c in contributors %}
+                    <div class="contributor-card" onclick="showCommits('{{ c.username }}')">
+                        <p class="username">{{ c.username }}</p>
+                        <p class="commits">Commits: {{ c.commits }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <p class="no-contrib">No contributors found.</p>
+        {% endif %}
+        <a class="back-link" href="/">Back to form</a>
+    </div>
+
+    <div id="popup-overlay" class="popup-overlay" onclick="hidePopup(event)">
+        <div class="popup-box" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="hidePopup(event)">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="popup-username">Contributor</h3>
+            <ul id="popup-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        const contributorData = {
+            {% for c in contributors %}
+            "{{ c.username }}": {{ c.commit_details | tojson }},
+            {% endfor %}
+        };
+
+        function showCommits(username) {
+            const overlay = document.getElementById("popup-overlay");
+            const title = document.getElementById("popup-username");
+            const list = document.getElementById("popup-list");
+
+            title.textContent = username;
+            list.innerHTML = "";
+
+            (contributorData[username] || []).forEach(msg => {
+                const li = document.createElement("li");
+                li.textContent = msg;
+                list.appendChild(li);
+            });
+
+            overlay.classList.add("active");
+        }
+
+        function hidePopup(event) {
+            document.getElementById("popup-overlay").classList.remove("active");
+        }
+    </script>
+</body>
+</html>
