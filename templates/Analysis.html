@@ -7,78 +7,96 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1><i class="fa-solid fa-code-branch"></i> Repository Insights</h1>
-
-        {% if repo_url %}
-            <p class="info"><strong>🔗 Repository:</strong> <a href="{{ repo_url }}" target="_blank">{{ repo_url }}</a></p>
-        {% endif %}
-
-        {% if owner %}
-            <h2><i class="fa-solid fa-user"></i> Owner</h2>
-            <p>{{ owner }}</p>
-        {% endif %}
-
-        {% if contributors %}
-            <h2><i class="fa-solid fa-users"></i> Contributors</h2>
-            <div class="content-layout">
-                <div class="contributors-grid">
-                    {% for c in contributors %}
-                    <div class="contributor-card" onclick="showCommits('{{ c.username }}')">
-                        <p class="username">@{{ c.username }}</p>
-                        <p class="commits">📝 Commits: {{ c.commits }}</p>
-                    </div>
-                    {% endfor %}
+    <div class="main-grid">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            {% if owner %}
+            <div class="sidebar-section">
+                <h2 class="sidebar-heading"><i class="fa-solid fa-user"></i> Owner</h2>
+                <div class="sidebar-box">
+                    <p>{{ owner }}</p>
                 </div>
             </div>
-        {% else %}
-            <p class="no-contrib">No contributors found.</p>
-        {% endif %}
-
-        {% if languages %}
-            <h2><i class="fa-solid fa-language"></i> Languages</h2>
-            <div class="content-layout">
-                {% for l in languages %}
-                <div class="contributor-card language-card">
-                    <p class="language">{{ l }}</p>
-                    <p class="bytes">🔢 Bytes: {{ languages[l] }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if open_issues or closed_issues %}
-            <h2><i class="fa-solid fa-bug"></i> Issues</h2>
-            {% if open_issues %}
-                <h3 style="margin-top:20px;color:#2ecc40;"><i class="fa-solid fa-circle-dot"></i> Open Issues</h3>
-                <div class="content-layout">
-                    <div class="contributors-grid">
-                        {% for i in open_issues|sort(attribute='created_at', reverse=True) %}
-                        <div class="contributor-card issue-card" onclick="showIssue('open', '{{ loop.index0 }}')">
-                            <p><strong>{{ i.title }}</strong></p>
-                            <p>🙋 Raised by: {{ i.user.login }}</p>
+            {% endif %}
+            {% if contributors %}
+            <div class="sidebar-section">
+                <h2 class="sidebar-heading"><i class="fa-solid fa-users"></i> Contributors</h2>
+                <div class="sidebar-box">
+                    <div class="sidebar-contributors-list">
+                        {% for c in contributors %}
+                        <div class="sidebar-contributor" onclick="showCommits('{{ c.username }}')">
+                            <span>@{{ c.username }}</span>
+                            <span class="sidebar-commit-count">{{ c.commits }} commits</span>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
-            {% else %}
-                <p class="no-issues">No open issues found.</p>
+            </div>
             {% endif %}
-            {% if closed_issues %}
-                <h3 style="margin-top:20px;color:#e67e22;"><i class="fa-solid fa-circle-check"></i> Closed Issues</h3>
-                <div class="content-layout">
-                    <div class="contributors-grid">
-                        {% for i in closed_issues|sort(attribute='created_at', reverse=True) %}
-                        <div class="contributor-card issue-resolved" onclick="showIssue('closed', '{{ loop.index0 }}')">
-                            <p><strong>{{ i.title }}</strong></p>
-                            <p>🙋 Raised by: {{ i.user.login }}</p>
+        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1><i class="fa-solid fa-code-branch"></i> Repository Insights</h1>
+            {% if repo_url %}
+                <p class="info"><strong>🔗 Repository:</strong> <a href="{{ repo_url }}" target="_blank">{{ repo_url }}</a></p>
+            {% endif %}
+
+            {% if languages %}
+            <div class="section-box languages-box">
+                <button class="section-btn" type="button" onclick="toggleSection('languages-section')">
+                    <i class="fa-solid fa-language"></i> LANGUAGES
+                </button>
+                <div id="languages-section" class="section-content">
+                    <div class="languages-row">
+                        {% for l in languages %}
+                        <div class="language-pill">
+                            <span class="language-name">{{ l }}</span>
+                            <span class="language-bytes">🔢 {{ languages[l] }} bytes</span>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
-            {% else %}
-                <p class="no-issues">No closed issues found.</p>
+            </div>
             {% endif %}
+
+            {% if open_issues or closed_issues %}
+            <div class="section-box">
+                <div class="section-title"><i class="fa-solid fa-bug"></i> ISSUES</div>
+                <div class="section-btn-group">
+                    <button class="section-btn" type="button"
+        onclick="toggleExclusiveSection('open-issues-section', ['open-issues-section','closed-issues-section'])">
+        <i class="fa-solid fa-circle-dot" style="color:#2ecc40;"></i> Open Issues
+    </button>
+    <button class="section-btn" type="button"
+        onclick="toggleExclusiveSection('closed-issues-section', ['open-issues-section','closed-issues-section'])">
+        <i class="fa-solid fa-circle-check" style="color:#e67e22;"></i> Closed Issues
+    </button>
+                </div>
+                <div id="open-issues-section" class="section-content">
+                    <div class="content-layout">
+                        <div class="contributors-grid">
+                            {% for i in open_issues|sort(attribute='created_at', reverse=True) %}
+                            <div class="contributor-card issue-card" onclick="showIssue('open', '{{ loop.index0 }}')">
+                                <p><strong>{{ i.title }}</strong></p>
+                                <p>🙋 Raised by: {{ i.user.login }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div id="closed-issues-section" class="section-content">
+                    <div class="content-layout">
+                        <div class="contributors-grid">
+                            {% for i in closed_issues|sort(attribute='created_at', reverse=True) %}
+                            <div class="contributor-card issue-resolved" onclick="showIssue('closed', '{{ loop.index0 }}')">
+                                <p><strong>{{ i.title }}</strong></p>
+                                <p>🙋 Raised by: {{ i.user.login }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Popup for issue details -->
             <div id="issue-popup-overlay" class="popup-overlay" onclick="hideIssuePopup(event)">
                 <div class="popup-box" onclick="event.stopPropagation()">
@@ -90,7 +108,6 @@
                 </div>
             </div>
             <script>
-                // Prepare issue data for popup
                 const openIssueData = [
                     {% for i in open_issues|sort(attribute='created_at', reverse=True) %}
                     {
@@ -99,7 +116,7 @@
                         created_at: {{ i.created_at|tojson }},
                         body: {{ i.body|tojson }},
                         state: {{ i.state|tojson }},
-                        url: {{ i.html_url|tojson }}   <!-- use html_url here -->
+                        url: {{ i.html_url|tojson }}
                     },
                     {% endfor %}
                 ];
@@ -111,7 +128,7 @@
                         created_at: {{ i.created_at|tojson }},
                         body: {{ i.body|tojson }},
                         state: {{ i.state|tojson }},
-                        url: {{ i.html_url|tojson }}   <!-- use html_url here -->
+                        url: {{ i.html_url|tojson }}
                     },
                     {% endfor %}
                 ];
@@ -137,141 +154,53 @@
                     document.getElementById("issue-popup-overlay").classList.remove("active");
                 }
             </script>
-        {% else %}
-            <p class="no-issues">No issues found.</p>
-        {% endif %}
-        {% if open_prs %}
-        <h2><i class="fa-solid fa-code-pull-request"></i> Open Pull Requests</h2>
-        <div class="content-layout">
-            <div class="contributors-grid">
-                {% for pr in open_prs %}
-                <div class="contributor-card" onclick="showPR('{{ loop.index0 }}')">
-                    <p><strong>{{ pr.title }}</strong></p>
-                    <p>🙋 By: {{ pr.user.login }}</p>
+            {% endif %}
+
+            {% if open_prs or closed_prs %}
+            <div class="section-box">
+                <div class="section-title"><i class="fa-solid fa-code-pull-request"></i> PULL REQUESTS</div>
+                <div class="section-btn-group">
+                    <button class="section-btn" type="button"
+        onclick="toggleExclusiveSection('open-prs-section', ['open-prs-section','closed-prs-section'])">
+        <i class="fa-solid fa-code-pull-request"></i> Open PRs
+    </button>
+    <button class="section-btn" type="button"
+        onclick="toggleExclusiveSection('closed-prs-section', ['open-prs-section','closed-prs-section'])">
+        <i class="fa-solid fa-code-pull-request"></i> Closed PRs
+    </button>
                 </div>
-                {% endfor %}
+                <div id="open-prs-section" class="section-content">
+                    <div class="content-layout">
+                        <div class="contributors-grid">
+                            {% for pr in open_prs %}
+                            <div class="contributor-card" onclick="showPR('{{ loop.index0 }}')">
+                                <p><strong>{{ pr.title }}</strong></p>
+                                <p>🙋 By: {{ pr.user.login }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div id="closed-prs-section" class="section-content">
+                    <div class="content-layout">
+                        <div class="contributors-grid">
+                            {% for pr in closed_prs %}
+                            <div class="contributor-card" onclick="showClosedPR('{{ loop.index0 }}')">
+                                <p><strong>{{ pr.title }}</strong></p>
+                                <p>🙋 By: {{ pr.user.login }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
+            {% endif %}
+
+            <a class="back-link" href="/"><i class="fa-solid fa-arrow-left"></i> Back to Form</a>
         </div>
-
-        <!-- Popup for PR details -->
-        <div id="pr-popup-overlay" class="popup-overlay" onclick="hidePRPopup(event)">
-            <div class="popup-box" onclick="event.stopPropagation()">
-                <button class="close-btn" onclick="hidePRPopup(event)">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-                <h3 id="pr-popup-title"></h3>
-                <div id="pr-popup-details"></div>
-            </div>
-        </div>
-
-        <script>
-        const prData = [
-            {% for pr in open_prs %}
-            {
-                title: {{ pr.title|tojson }},
-                user: {{ pr.user.login|tojson }},
-                created_at: {{ pr.created_at|tojson }},
-                body: {{ pr.body|tojson }},
-                state: {{ pr.state|tojson }},
-                merged: {{ pr.merged|tojson }},
-                url: {{ pr.html_url|tojson }}
-            },
-        {% endfor %}
-        ];
-
-        function showPR(idx) {
-            const overlay = document.getElementById("pr-popup-overlay");
-            const title = document.getElementById("pr-popup-title");
-            const details = document.getElementById("pr-popup-details");
-            const pr = prData[idx];
-
-            title.textContent = pr.title;
-            details.innerHTML = `
-                <p>🙋 By: ${pr.user}</p>
-                <p>🕒 Created: ${pr.created_at}</p>
-                <p>📝 Description: ${pr.body}</p>
-                <p>📌 State: ${pr.state}</p>
-                <p>✅ Merged: ${pr.merged}</p>
-                <p><a href="${pr.url}" target="_blank">🔗 View PR on GitHub</a></p>
-            `;
-            overlay.classList.add("active");
-        }
-
-        function hidePRPopup(event) {
-            document.getElementById("pr-popup-overlay").classList.remove("active");
-        }
-            </script>
-        {% else %}
-            <p class="no-contrib">No Open Pull Requests found.</p>
-        {% endif %}
-        {% if closed_prs %}
-<h2><i class="fa-solid fa-code-pull-request"></i> Closed Pull Requests</h2>
-<div class="content-layout">
-    <div class="contributors-grid">
-        {% for pr in closed_prs %}
-        <div class="contributor-card" onclick="showClosedPR('{{ loop.index0 }}')">
-            <p><strong>{{ pr.title }}</strong></p>
-            <p>🙋 By: {{ pr.user.login }}</p>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
-<!-- Popup for CLOSED PR details -->
-<div id="closed-pr-popup-overlay" class="popup-overlay" onclick="hideClosedPRPopup(event)">
-    <div class="popup-box" onclick="event.stopPropagation()">
-        <button class="close-btn" onclick="hideClosedPRPopup(event)">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-        <h3 id="closed-pr-popup-title"></h3>
-        <div id="closed-pr-popup-details"></div>
-    </div>
-</div>
-
-<script>
-const closedPrData = [
-    {% for pr in closed_prs %}
-    {
-        title: {{ pr.title|tojson }},
-        user: {{ pr.user.login|tojson }},
-        created_at: {{ pr.created_at|tojson }},
-        body: {{ pr.body|tojson }},
-        state: {{ pr.state|tojson }},
-        merged: {{ pr.merged|tojson }},
-        url: {{ pr.html_url|tojson }}
-    },
-    {% endfor %}
-];
-
-function showClosedPR(idx) {
-    const overlay = document.getElementById("closed-pr-popup-overlay");
-    const title = document.getElementById("closed-pr-popup-title");
-    const details = document.getElementById("closed-pr-popup-details");
-    const pr = closedPrData[idx];
-
-    title.textContent = pr.title;
-    details.innerHTML = `
-        <p>🙋 By: ${pr.user}</p>
-        <p>🕒 Created: ${pr.created_at}</p>
-        <p>📝 Description: ${pr.body}</p>
-        <p>📌 State: ${pr.state}</p>
-        <p>✅ Merged: ${pr.merged}</p>
-        <p><a href="${pr.url}" target="_blank">🔗 View PR on GitHub</a></p>
-    `;
-        overlay.classList.add("active");
-    }
-
-    function hideClosedPRPopup(event) {
-        document.getElementById("closed-pr-popup-overlay").classList.remove("active");
-    }
-    </script>
-    {% else %}
-        <p class="no-contrib">No Closed Pull Requests found.</p>
-    {% endif %}
-
-        <a class="back-link" href="/"><i class="fa-solid fa-arrow-left"></i> Back to Form</a>
     </div>
 
+    <!-- Contributor popup -->
     <div id="popup-overlay" class="popup-overlay" onclick="hidePopup(event)">
         <div class="popup-box" onclick="event.stopPropagation()">
             <button class="close-btn" onclick="hidePopup(event)">
@@ -309,6 +238,23 @@ function showClosedPR(idx) {
         function hidePopup(event) {
             document.getElementById("popup-overlay").classList.remove("active");
         }
+
+        // Toggle section visibility
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('active');
+        }
+
+        function toggleExclusiveSection(id, groupIds) {
+    groupIds.forEach(function(gid) {
+        const el = document.getElementById(gid);
+        if (gid === id) {
+            el.classList.toggle('active');
+        } else {
+            el.classList.remove('active');
+        }
+    });
+}
     </script>
 </body>
 </html>
