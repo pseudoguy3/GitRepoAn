@@ -1,28 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Repository Analysis</title>
+    <meta charset="UTF-8">
+    <title>Repository Insights</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Repository Analysis</h1>
+        <h1><i class="fa-solid fa-code-branch"></i> Repository Insights</h1>
+
         {% if repo_url %}
-            <p><strong>Repository URL:</strong> <a href="{{ repo_url }}" target="_blank">{{ repo_url }}</a></p>
+            <p class="info"><strong>🔗 Repository:</strong> <a href="{{ repo_url }}" target="_blank">{{ repo_url }}</a></p>
         {% endif %}
+
         {% if owner %}
-            <h2>Owner</h2>
+            <h2><i class="fa-solid fa-user"></i> Owner</h2>
             <p>{{ owner }}</p>
         {% endif %}
+
         {% if contributors %}
-            <h2>Contributors</h2>
+            <h2><i class="fa-solid fa-users"></i> Contributors</h2>
             <div class="content-layout">
                 <div class="contributors-grid">
                     {% for c in contributors %}
                     <div class="contributor-card" onclick="showCommits('{{ c.username }}')">
-                        <p class="username">{{ c.username }}</p>
-                        <p class="commits">Commits: {{ c.commits }}</p>
+                        <p class="username">@{{ c.username }}</p>
+                        <p class="commits">📝 Commits: {{ c.commits }}</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -30,18 +34,38 @@
         {% else %}
             <p class="no-contrib">No contributors found.</p>
         {% endif %}
+
         {% if languages %}
-            <h2>Languages</h2>
+            <h2><i class="fa-solid fa-language"></i> Languages</h2>
             <div class="content-layout">
                 {% for l in languages %}
-                <div class="contributor-card">
+                <div class="contributor-card language-card">
                     <p class="language">{{ l }}</p>
-                    <p class="bytes">Bytes: {{ languages[l] }}</p>
+                    <p class="bytes">🔢 Bytes: {{ languages[l] }}</p>
                 </div>
                 {% endfor %}
             </div>
         {% endif %}
-        <a class="back-link" href="/">Back to form</a>
+
+        {% if issues %}
+            <h2><i class="fa-solid fa-bug"></i> Issues</h2>
+            <div class="content-layout">
+                {% for i in issues %}
+                <div class="popup-box issue-card" style="position:relative; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;">
+                    <p class="le"><strong>{{ i.title }}</strong></p>
+                    <p>🙋 Raised by: {{ i.user.login }}</p>
+                    <p>🕒 Created: {{ i.created_at }}</p>
+                    <p>📝 Description: {{ i.body }}</p>
+                    <p>📌 State: {{ i.state }}</p>
+                    <p><a href="{{ i.url }}" target="_blank">🔗 View Issue</a></p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-issues">No issues found.</p>
+        {% endif %}
+
+        <a class="back-link" href="/"><i class="fa-solid fa-arrow-left"></i> Back to Form</a>
     </div>
 
     <div id="popup-overlay" class="popup-overlay" onclick="hidePopup(event)">
