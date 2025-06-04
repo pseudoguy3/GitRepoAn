@@ -23,3 +23,7 @@ class GitHubService:
 
     def get_commits(self, repo, contributor):
         return repo.get_commits(author=contributor)
+    
+    def get_languages(self, repo):
+        print(repo.get_languages())
+        return repo.get_languages()

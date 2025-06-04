@@ -8,7 +8,8 @@ class RepoValidator:
         repo = self.github.get_repo(repo_url)
         return {
             "creator": repo.owner.login,
-            "contributors": self._get_contributor_stats(repo)
+            "contributors": self._get_contributor_stats(repo),
+            "languages": self.github.get_languages(repo)
         }
 
     def _get_contributor_stats(self, repo):

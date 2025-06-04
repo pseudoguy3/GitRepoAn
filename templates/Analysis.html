@@ -30,6 +30,17 @@
         {% else %}
             <p class="no-contrib">No contributors found.</p>
         {% endif %}
+        {% if languages %}
+            <h2>Languages</h2>
+            <div class="content-layout">
+                {% for l in languages %}
+                <div class="contributor-card">
+                    <p class="language">{{ l }}</p>
+                    <p class="bytes">Bytes: {{ languages[l] }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         <a class="back-link" href="/">Back to form</a>
     </div>
 

@@ -21,11 +21,12 @@ def repo_form():
                 result = validator.validate_repo(repo_url)
                 owner = result.get("creator")
                 contributors = result.get("contributors")
+                languages = result.get("languages")
             except Exception as e:
                 error = str(e)
         if not error:
             # If no error, show analysis page
-            return render_template("Analysis.html", owner=owner, contributors=contributors, repo_url=repo_url)
+            return render_template("Analysis.html", owner=owner, contributors=contributors, repo_url=repo_url, languages=languages)
     # On GET or error, show form
     return render_template("repoForm.html", error=error)
 
