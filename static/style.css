@@ -214,3 +214,7 @@ button[type="submit"]:hover {
     background: #fff0f3;
     border:2px solid #ff5e78;
 }
+.issue-resolved {
+    background: #d4f8e8;
+    border-color: #2ecc71;
+}

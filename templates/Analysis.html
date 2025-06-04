@@ -47,18 +47,38 @@
             </div>
         {% endif %}
 
-        {% if issues %}
+        {% if open_issues or closed_issues %}
             <h2><i class="fa-solid fa-bug"></i> Issues</h2>
-            <div class="content-layout">
-                <div class="contributors-grid">
-                    {% for i in issues|sort(attribute='created_at', reverse=True) %}
-                    <div class="contributor-card issue-card" onclick="showIssue('{{ loop.index0 }}')">
-                        <p><strong>{{ i.title }}</strong></p>
-                        <p>🙋 Raised by: {{ i.user.login }}</p>
+            {% if open_issues %}
+                <h3 style="margin-top:20px;color:#2ecc40;"><i class="fa-solid fa-circle-dot"></i> Open Issues</h3>
+                <div class="content-layout">
+                    <div class="contributors-grid">
+                        {% for i in open_issues|sort(attribute='created_at', reverse=True) %}
+                        <div class="contributor-card issue-card" onclick="showIssue('open', '{{ loop.index0 }}')">
+                            <p><strong>{{ i.title }}</strong></p>
+                            <p>🙋 Raised by: {{ i.user.login }}</p>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
+            {% else %}
+                <p class="no-issues">No open issues found.</p>
+            {% endif %}
+            {% if closed_issues %}
+                <h3 style="margin-top:20px;color:#e67e22;"><i class="fa-solid fa-circle-check"></i> Closed Issues</h3>
+                <div class="content-layout">
+                    <div class="contributors-grid">
+                        {% for i in closed_issues|sort(attribute='created_at', reverse=True) %}
+                        <div class="contributor-card issue-resolved" onclick="showIssue('closed', '{{ loop.index0 }}')">
+                            <p><strong>{{ i.title }}</strong></p>
+                            <p>🙋 Raised by: {{ i.user.login }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <p class="no-issues">No closed issues found.</p>
+            {% endif %}
             <!-- Popup for issue details -->
             <div id="issue-popup-overlay" class="popup-overlay" onclick="hideIssuePopup(event)">
                 <div class="popup-box" onclick="event.stopPropagation()">
@@ -71,8 +91,20 @@
             </div>
             <script>
                 // Prepare issue data for popup
-                const issueData = [
-                    {% for i in issues|sort(attribute='created_at', reverse=True) %}
+                const openIssueData = [
+                    {% for i in open_issues|sort(attribute='created_at', reverse=True) %}
+                    {
+                        title: {{ i.title|tojson }},
+                        user: {{ i.user.login|tojson }},
+                        created_at: {{ i.created_at|tojson }},
+                        body: {{ i.body|tojson }},
+                        state: {{ i.state|tojson }},
+                        url: {{ i.url|tojson }}
+                    },
+                    {% endfor %}
+                ];
+                const closedIssueData = [
+                    {% for i in closed_issues|sort(attribute='created_at', reverse=True) %}
                     {
                         title: {{ i.title|tojson }},
                         user: {{ i.user.login|tojson }},
@@ -84,11 +116,11 @@
                     {% endfor %}
                 ];
 
-                function showIssue(idx) {
+                function showIssue(type, idx) {
                     const overlay = document.getElementById("issue-popup-overlay");
                     const title = document.getElementById("issue-popup-title");
                     const details = document.getElementById("issue-popup-details");
-                    const issue = issueData[idx];
+                    const issue = (type === 'open' ? openIssueData : closedIssueData)[idx];
 
                     title.textContent = issue.title;
                     details.innerHTML = `

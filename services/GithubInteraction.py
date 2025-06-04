@@ -28,8 +28,8 @@ class GitHubService:
         print(repo.get_languages())
         return repo.get_languages()
     
-    def get_issues(self, repo):
-        issues = repo.get_issues(state='all')
+    def get_issues_open(self, repo):
+        issues = repo.get_issues(state='open')
         if issues:
             for issue in issues:
                 print(f"Issue #{issue.number} - {issue.title}")
@@ -41,8 +41,22 @@ class GitHubService:
                 print("-------------------------------")
         else:
             print("No issues found in the repository.")
-        return repo.get_issues(state='all')
+        return issues
     
+    def get_issues_closed(self, repo):
+        issues = repo.get_issues(state='closed')
+        if issues:
+            for issue in issues:
+                print(f"Issue #{issue.number} - {issue.title}")
+                print(f"State: {issue.state}")
+                print(f"Author: {issue.user.login}")
+                print(f"Created at: {issue.created_at}")
+                print(f"Body: {issue.body}")
+                print("-" * 50)
+                print("-------------------------------")
+        else:
+            print("No issues found in the repository.")
+        return issues
 
     def get_pulls_open(self, repo):
         return repo.get_pulls(state = 'open')

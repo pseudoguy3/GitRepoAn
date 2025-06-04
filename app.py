@@ -22,14 +22,15 @@ def repo_form():
                 owner = result.get("creator")
                 contributors = result.get("contributors")
                 languages = result.get("languages")
-                issues = result.get("issues")
+                open_issues = result.get("open_issues")
+                closed_issues = result.get("closed_issues")
                 open_prs = result.get("open_prs")
                 closed_prs = result.get("closed_prs")
             except Exception as e:
                 error = str(e)
         if not error:
             # If no error, show analysis page
-            return render_template("Analysis.html", owner=owner, contributors=contributors, repo_url=repo_url, languages=languages, issues=issues, open_prs=open_prs, closed_prs=closed_prs)
+            return render_template("Analysis.html", owner=owner, contributors=contributors, repo_url=repo_url, languages=languages,open_issues=open_issues, closed_issues=closed_issues, open_prs=open_prs, closed_prs=closed_prs)
     # On GET or error, show form
     return render_template("repoForm.html", error=error)
 
