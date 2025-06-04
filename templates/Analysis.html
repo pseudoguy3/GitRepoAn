@@ -141,22 +141,134 @@
             <p class="no-issues">No issues found.</p>
         {% endif %}
         {% if open_prs %}
-            <h2>Open Pull Requests</h2>
-            <div class="content-layout">
-                <div class="contributors-grid">
-                    {% for pr in open_prs %}
-                    <div class="contributor-card">
-                        <p class="username">Title :{{ pr.title }}</p>
-                        <p class="commits">User: {{ pr.user.login }}</p>
-                        <p class="commits">Merged?: {{pr.merged}}</p>
-
-                    </div>
-                    {% endfor %}
+        <h2><i class="fa-solid fa-code-pull-request"></i> Open Pull Requests</h2>
+        <div class="content-layout">
+            <div class="contributors-grid">
+                {% for pr in open_prs %}
+                <div class="contributor-card" onclick="showPR('{{ loop.index0 }}')">
+                    <p><strong>{{ pr.title }}</strong></p>
+                    <p>🙋 By: {{ pr.user.login }}</p>
                 </div>
+                {% endfor %}
             </div>
+        </div>
+
+        <!-- Popup for PR details -->
+        <div id="pr-popup-overlay" class="popup-overlay" onclick="hidePRPopup(event)">
+            <div class="popup-box" onclick="event.stopPropagation()">
+                <button class="close-btn" onclick="hidePRPopup(event)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <h3 id="pr-popup-title"></h3>
+                <div id="pr-popup-details"></div>
+            </div>
+        </div>
+
+        <script>
+        const prData = [
+            {% for pr in open_prs %}
+            {
+                title: {{ pr.title|tojson }},
+                user: {{ pr.user.login|tojson }},
+                created_at: {{ pr.created_at|tojson }},
+                body: {{ pr.body|tojson }},
+                state: {{ pr.state|tojson }},
+                merged: {{ pr.merged|tojson }},
+                url: {{ pr.html_url|tojson }}
+            },
+        {% endfor %}
+        ];
+
+        function showPR(idx) {
+            const overlay = document.getElementById("pr-popup-overlay");
+            const title = document.getElementById("pr-popup-title");
+            const details = document.getElementById("pr-popup-details");
+            const pr = prData[idx];
+
+            title.textContent = pr.title;
+            details.innerHTML = `
+                <p>🙋 By: ${pr.user}</p>
+                <p>🕒 Created: ${pr.created_at}</p>
+                <p>📝 Description: ${pr.body}</p>
+                <p>📌 State: ${pr.state}</p>
+                <p>✅ Merged: ${pr.merged}</p>
+                <p><a href="${pr.url}" target="_blank">🔗 View PR on GitHub</a></p>
+            `;
+            overlay.classList.add("active");
+        }
+
+        function hidePRPopup(event) {
+            document.getElementById("pr-popup-overlay").classList.remove("active");
+        }
+            </script>
         {% else %}
             <p class="no-contrib">No Open Pull Requests found.</p>
         {% endif %}
+        {% if closed_prs %}
+<h2><i class="fa-solid fa-code-pull-request"></i> Closed Pull Requests</h2>
+<div class="content-layout">
+    <div class="contributors-grid">
+        {% for pr in closed_prs %}
+        <div class="contributor-card" onclick="showClosedPR('{{ loop.index0 }}')">
+            <p><strong>{{ pr.title }}</strong></p>
+            <p>🙋 By: {{ pr.user.login }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Popup for CLOSED PR details -->
+<div id="closed-pr-popup-overlay" class="popup-overlay" onclick="hideClosedPRPopup(event)">
+    <div class="popup-box" onclick="event.stopPropagation()">
+        <button class="close-btn" onclick="hideClosedPRPopup(event)">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h3 id="closed-pr-popup-title"></h3>
+        <div id="closed-pr-popup-details"></div>
+    </div>
+</div>
+
+<script>
+const closedPrData = [
+    {% for pr in closed_prs %}
+    {
+        title: {{ pr.title|tojson }},
+        user: {{ pr.user.login|tojson }},
+        created_at: {{ pr.created_at|tojson }},
+        body: {{ pr.body|tojson }},
+        state: {{ pr.state|tojson }},
+        merged: {{ pr.merged|tojson }},
+        url: {{ pr.html_url|tojson }}
+    },
+    {% endfor %}
+];
+
+function showClosedPR(idx) {
+    const overlay = document.getElementById("closed-pr-popup-overlay");
+    const title = document.getElementById("closed-pr-popup-title");
+    const details = document.getElementById("closed-pr-popup-details");
+    const pr = closedPrData[idx];
+
+    title.textContent = pr.title;
+    details.innerHTML = `
+        <p>🙋 By: ${pr.user}</p>
+        <p>🕒 Created: ${pr.created_at}</p>
+        <p>📝 Description: ${pr.body}</p>
+        <p>📌 State: ${pr.state}</p>
+        <p>✅ Merged: ${pr.merged}</p>
+        <p><a href="${pr.url}" target="_blank">🔗 View PR on GitHub</a></p>
+    `;
+        overlay.classList.add("active");
+    }
+
+    function hideClosedPRPopup(event) {
+        document.getElementById("closed-pr-popup-overlay").classList.remove("active");
+    }
+    </script>
+    {% else %}
+        <p class="no-contrib">No Closed Pull Requests found.</p>
+    {% endif %}
+
         <a class="back-link" href="/"><i class="fa-solid fa-arrow-left"></i> Back to Form</a>
     </div>
 
