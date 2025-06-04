@@ -50,17 +50,61 @@
         {% if issues %}
             <h2><i class="fa-solid fa-bug"></i> Issues</h2>
             <div class="content-layout">
-                {% for i in issues %}
-                <div class="popup-box issue-card" style="position:relative; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;">
-                    <p class="le"><strong>{{ i.title }}</strong></p>
-                    <p>🙋 Raised by: {{ i.user.login }}</p>
-                    <p>🕒 Created: {{ i.created_at }}</p>
-                    <p>📝 Description: {{ i.body }}</p>
-                    <p>📌 State: {{ i.state }}</p>
-                    <p><a href="{{ i.url }}" target="_blank">🔗 View Issue</a></p>
+                <div class="contributors-grid">
+                    {% for i in issues|sort(attribute='created_at', reverse=True) %}
+                    <div class="contributor-card issue-card" onclick="showIssue('{{ loop.index0 }}')">
+                        <p><strong>{{ i.title }}</strong></p>
+                        <p>🙋 Raised by: {{ i.user.login }}</p>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
+            <!-- Popup for issue details -->
+            <div id="issue-popup-overlay" class="popup-overlay" onclick="hideIssuePopup(event)">
+                <div class="popup-box" onclick="event.stopPropagation()">
+                    <button class="close-btn" onclick="hideIssuePopup(event)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <h3 id="issue-popup-title"></h3>
+                    <div id="issue-popup-details"></div>
+                </div>
+            </div>
+            <script>
+                // Prepare issue data for popup
+                const issueData = [
+                    {% for i in issues|sort(attribute='created_at', reverse=True) %}
+                    {
+                        title: {{ i.title|tojson }},
+                        user: {{ i.user.login|tojson }},
+                        created_at: {{ i.created_at|tojson }},
+                        body: {{ i.body|tojson }},
+                        state: {{ i.state|tojson }},
+                        url: {{ i.url|tojson }}
+                    },
+                    {% endfor %}
+                ];
+
+                function showIssue(idx) {
+                    const overlay = document.getElementById("issue-popup-overlay");
+                    const title = document.getElementById("issue-popup-title");
+                    const details = document.getElementById("issue-popup-details");
+                    const issue = issueData[idx];
+
+                    title.textContent = issue.title;
+                    details.innerHTML = `
+                        <p>🙋 Raised by: ${issue.user}</p>
+                        <p>🕒 Created: ${issue.created_at}</p>
+                        <p>📝 Description: ${issue.body}</p>
+                        <p>📌 State: ${issue.state}</p>
+                        <p><a href="${issue.url}" target="_blank">🔗 View Issue</a></p>
+                    `;
+                    overlay.classList.add("active");
+                }
+
+                function hideIssuePopup(event) {
+                    document.getElementById("issue-popup-overlay").classList.remove("active");
+                }
+            </script>
         {% else %}
             <p class="no-issues">No issues found.</p>
         {% endif %}
