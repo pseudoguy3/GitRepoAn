@@ -11,7 +11,9 @@ class RepoValidator:
             "creator": repo.owner.login,
             "contributors": self._get_contributor_stats(repo),
             "languages": self.github.get_languages(repo),
-            "issues": self.github.get_issues(repo)
+            "issues": self.github.get_issues(repo),
+            "open_prs": self.github.get_pulls_open(repo),
+            "closed_prs": self.github.get_pulls_closed(repo)
         }
 
     def _get_contributor_stats(self, repo):

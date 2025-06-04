@@ -42,3 +42,10 @@ class GitHubService:
         else:
             print("No issues found in the repository.")
         return repo.get_issues(state='all')
+    
+
+    def get_pulls_open(self, repo):
+        return repo.get_pulls(state = 'open')
+    
+    def get_pulls_closed(self, repo):
+        return repo.get_pulls(state = 'closed')

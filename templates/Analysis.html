@@ -108,7 +108,23 @@
         {% else %}
             <p class="no-issues">No issues found.</p>
         {% endif %}
+        {% if open_prs %}
+            <h2>Open Pull Requests</h2>
+            <div class="content-layout">
+                <div class="contributors-grid">
+                    {% for pr in open_prs %}
+                    <div class="contributor-card">
+                        <p class="username">Title :{{ pr.title }}</p>
+                        <p class="commits">User: {{ pr.user.login }}</p>
+                        <p class="commits">Merged?: {{pr.merged}}</p>
 
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <p class="no-contrib">No Open Pull Requests found.</p>
+        {% endif %}
         <a class="back-link" href="/"><i class="fa-solid fa-arrow-left"></i> Back to Form</a>
     </div>
 
