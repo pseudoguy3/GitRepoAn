@@ -99,7 +99,7 @@
                         created_at: {{ i.created_at|tojson }},
                         body: {{ i.body|tojson }},
                         state: {{ i.state|tojson }},
-                        url: {{ i.url|tojson }}
+                        url: {{ i.html_url|tojson }}   <!-- use html_url here -->
                     },
                     {% endfor %}
                 ];
@@ -111,7 +111,7 @@
                         created_at: {{ i.created_at|tojson }},
                         body: {{ i.body|tojson }},
                         state: {{ i.state|tojson }},
-                        url: {{ i.url|tojson }}
+                        url: {{ i.html_url|tojson }}   <!-- use html_url here -->
                     },
                     {% endfor %}
                 ];
@@ -124,12 +124,12 @@
 
                     title.textContent = issue.title;
                     details.innerHTML = `
-                        <p>🙋 Raised by: ${issue.user}</p>
-                        <p>🕒 Created: ${issue.created_at}</p>
-                        <p>📝 Description: ${issue.body}</p>
-                        <p>📌 State: ${issue.state}</p>
-                        <p><a href="${issue.url}" target="_blank">🔗 View Issue</a></p>
-                    `;
+    <p>🙋 Raised by: ${issue.user}</p>
+    <p>🕒 Created: ${issue.created_at}</p>
+    <p>📝 Description: ${issue.body}</p>
+    <p>📌 State: ${issue.state}</p>
+    <p><a href="${issue.url}" target="_blank">🔗 View Issue</a></p>
+`;
                     overlay.classList.add("active");
                 }
 
